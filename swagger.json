@@ -1,0 +1,3660 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "DACW",
+    "version": "1.0.0",
+    "summary": "A Public API for the Dune: Awakening Community Wiki",
+    "description": "A Public, Read-only REST API for the [Dune: Awakening Community Wiki](https://awakening.wiki).<br/>Please note: The numeric Id field returned in some responses is for internal wiki use only and should be ignored.<br/>Dune Awakening game content and materials Â© Funcom Oslo AS.",
+    "license": {
+      "name": "Creative Commons Attribution Non Commercial Share Alike 4.0 International",
+      "identifier": "CC-BY-NC-SA-4.0"
+    },
+    "contact":{
+      "name": "Wiki Admin",
+      "url": "https://awakening.wiki/User:FlamingMojo",
+      "email": "admin@awakening.wiki"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.awakening.wiki"
+    }
+  ],
+  "paths": {
+    "/items": {
+      "get": {
+        "summary": "Items list",
+        "operationId": "items-db-table-row-list",
+        "description": "List of all rows from Items table and response data fields can be filtered based on query params.",
+        "tags": ["Items"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["items"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* items - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ItemsResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/items/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Items read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "items-read",
+        "tags": ["Items"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/items/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["items"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* items - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Items count",
+        "operationId": "items-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Items"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/ammo/": {
+      "get": {
+        "summary": "Ammo list",
+        "operationId": "ammo-db-table-row-list",
+        "description": "List of all rows from Ammo table and response data fields can be filtered based on query params.",
+        "tags": ["Ammo"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["ammo"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* ammo - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AmmoResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ammo/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Ammo read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "ammo-read",
+        "tags": ["Ammo"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AmmoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ammo/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["ammo"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* ammo - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Ammo count",
+        "operationId": "ammo-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Ammo"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/consumables/": {
+      "get": {
+        "summary": "Consumables list",
+        "operationId": "consumables-db-table-row-list",
+        "description": "List of all rows from Consumables table and response data fields can be filtered based on query params.",
+        "tags": ["Consumables"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["consumables"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* consumables - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ConsumablesResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/consumables/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Consumables read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "consumables-read",
+        "tags": ["Consumables"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsumablesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/consumables/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["consumables"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* consumables - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Consumables count",
+        "operationId": "consumables-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Consumables"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/contract_items/": {
+      "get": {
+        "summary": "Contract Items list",
+        "operationId": "contract items-db-table-row-list",
+        "description": "List of all rows from Contract Items table and response data fields can be filtered based on query params.",
+        "tags": ["Contract Items"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["contract_items"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* contract_items - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Contract ItemsResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contract_items/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Contract Items read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "contract items-read",
+        "tags": ["Contract Items"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contract ItemsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contract_items/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["contract_items"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* contract_items - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Contract Items count",
+        "operationId": "contract items-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Contract Items"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/garments/": {
+      "get": {
+        "summary": "Garments list",
+        "operationId": "garments-db-table-row-list",
+        "description": "List of all rows from Garments table and response data fields can be filtered based on query params.",
+        "tags": ["Garments"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["garments"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* garments - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GarmentsResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/garments/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Garments read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "garments-read",
+        "tags": ["Garments"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GarmentsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/garments/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["garments"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* garments - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Garments count",
+        "operationId": "garments-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Garments"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/resources/": {
+      "get": {
+        "summary": "Resources list",
+        "operationId": "resources-db-table-row-list",
+        "description": "List of all rows from Resources table and response data fields can be filtered based on query params.",
+        "tags": ["Resources"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["resources"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* resources - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ResourcesResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Resources read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "resources-read",
+        "tags": ["Resources"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourcesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resources/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["resources"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* resources - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Resources count",
+        "operationId": "resources-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Resources"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/tools": {
+      "get": {
+        "summary": "Tools list",
+        "operationId": "tools-db-table-row-list",
+        "description": "List of all rows from Tools table and response data fields can be filtered based on query params.",
+        "tags": ["Tools"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["tools"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* tools - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ToolsResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Tools read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "tools-read",
+        "tags": ["Tools"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["tools"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* tools - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Tools count",
+        "operationId": "tools-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Tools"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/vehicles/": {
+      "get": {
+        "summary": "Vehicles list",
+        "operationId": "vehicles-db-table-row-list",
+        "description": "List of all rows from Vehicles table and response data fields can be filtered based on query params.",
+        "tags": ["Vehicles"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["Vehicles"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* Vehicles - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VehiclesResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vehicles/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Vehicles read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "vehicles-read",
+        "tags": ["Vehicles"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehiclesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vehicles/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["Vehicles"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* Vehicles - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Vehicles count",
+        "operationId": "vehicles-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Vehicles"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    },
+    "/weapons/": {
+      "get": {
+        "summary": "Weapons list",
+        "operationId": "weapons-db-table-row-list",
+        "description": "List of all rows from Weapons table and response data fields can be filtered based on query params.",
+        "tags": ["Weapons"],
+        "parameters": [{
+          "schema": {
+            "type": "string",
+            "enum": ["weapons"]
+          },
+          "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* weapons - Default view",
+          "name": "viewId",
+          "in": "query",
+          "required": false
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "sort",
+          "description": "Comma separated field names to sort rows, rows will sort in ascending order based on provided columns. To sort in descending order provide `-` prefix along with column name, like `-field`. Example : `sort=field1,-field2`"
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 1
+          },
+          "in": "query",
+          "name": "limit",
+          "description": "The `limit` parameter used for pagination, the response collection size depends on limit value with default value `25` and maximum value `1000`, which can be overridden by environment variables `DB_QUERY_LIMIT_DEFAULT` and `DB_QUERY_LIMIT_MAX` respectively.",
+          "example": 25
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "in": "query",
+          "name": "shuffle",
+          "description": "The `shuffle` parameter used for pagination, the response will be shuffled if it is set to 1.",
+          "example": 0
+        }, {
+          "schema": {
+            "type": "number",
+            "minimum": 0
+          },
+          "in": "query",
+          "name": "offset",
+          "description": "The `offset` parameter used for pagination, the value helps to select collection from a certain index.",
+          "example": 0
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WeaponsResponse"
+                      }
+                    },
+                    "PageInfo": {
+                      "$ref": "#/components/schemas/Paginated"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/weapons/{item_id}": {
+      "get": {
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "name": "item_id",
+          "in": "path",
+          "required": true,
+          "example": 1,
+          "description": "Primary key of the record you want to read. If the table have composite primary key then combine them by using `___` and pass it as primary key."
+        }, {
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "fields",
+          "description": "Array of field names or comma separated filed names to include in the response objects. In array syntax pass it like `fields[]=field1&fields[]=field2` or alternately `fields=field1,field2`."
+        }],
+        "summary": "Weapons read",
+        "description": "Read a row data by using the **primary key** column value.",
+        "operationId": "weapons-read",
+        "tags": ["Weapons"],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeaponsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/weapons/count": {
+      "parameters": [{
+        "schema": {
+          "type": "string",
+          "enum": ["weapons"]
+        },
+        "description": "Allows you to fetch records that are currently visible within a specific view.\n\nViews:\n* weapons - Default view",
+        "name": "viewId",
+        "in": "query",
+        "required": false
+      }],
+      "get": {
+        "summary": "Weapons count",
+        "operationId": "weapons-count",
+        "description": "Get rows count of a table by applying optional filters.",
+        "tags": ["Weapons"],
+        "parameters": [{
+          "schema": {
+            "type": "string"
+          },
+          "in": "query",
+          "name": "where",
+          "description": "This can be used for filtering rows, which accepts complicated where conditions. For more info visit [here](https://docs.nocodb.com/developer-resources/rest-apis#comparison-operators). Example : `where=(field1,eq,value)`"
+        }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["list", "pageInfo"]
+                },
+                "examples": {
+                  "Example 1": {
+                    "value": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Paginated": {
+        "title": "Paginated",
+        "type": "object",
+        "properties": {
+          "pageSize": {
+            "type": "integer"
+          },
+          "totalRows": {
+            "type": "integer"
+          },
+          "isFirstPage": {
+            "type": "boolean"
+          },
+          "isLastPage": {
+            "type": "boolean"
+          },
+          "page": {
+            "type": "number"
+          }
+        }
+      },
+      "Attachment": {
+        "title": "Attachment",
+        "type": "object",
+        "properties": {
+          "mimetype": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        }
+      },
+      "Groupby": {
+        "title": "Groupby",
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "description": "count"
+          },
+          "column_name": {
+            "type": "string",
+            "description": "the value of the given column"
+          }
+        }
+      },
+      "VehiclesResponse": {
+        "title": "Vehicles Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "max_quantity": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "dropped_on_death": {
+            "type": "string"
+          },
+          "assembly_requirement": {
+            "type": "string"
+          },
+          "acceleration": {
+            "type": "string"
+          },
+          "speed": {
+            "type": "string"
+          },
+          "power_consumption": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "unique": {
+            "type": "string"
+          },
+          "subcategory": {
+            "type": "string"
+          }
+        }
+      },
+      "VehiclesRequest": {
+        "title": "Vehicles Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "max_quantity": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "dropped_on_death": {
+            "type": "string"
+          },
+          "assembly_requirement": {
+            "type": "string"
+          },
+          "acceleration": {
+            "type": "string"
+          },
+          "speed": {
+            "type": "string"
+          },
+          "power_consumption": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "unique": {
+            "type": "string"
+          },
+          "subcategory": {
+            "type": "string"
+          }
+        }
+      },
+      "VehiclesIdRequest": {
+        "title": "Vehicles Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          }
+        }
+      },
+      "Marker CollectionResponse": {
+        "title": "Marker Collection Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "markers": {
+            "type": "number"
+          },
+          "x_coords": {
+            "type": "object"
+          },
+          "y_coords": {
+            "type": "object"
+          },
+          "Created time": {
+            "type": "string"
+          },
+          "Last modified time": {
+            "type": "string"
+          }
+        }
+      },
+      "Marker CollectionRequest": {
+        "title": "Marker Collection Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          }
+        }
+      },
+      "Marker CollectionIdRequest": {
+        "title": "Marker Collection Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "MarkersResponse": {
+        "title": "Markers Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "nc_np4m___Marker Collection_id": {
+            "type": "integer"
+          },
+          "Marker Collection": {
+            "$ref": "#/components/schemas/Marker CollectionRequest"
+          }
+        }
+      },
+      "MarkersRequest": {
+        "title": "Markers Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          }
+        }
+      },
+      "MarkersIdRequest": {
+        "title": "Markers Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "WeaponsResponse": {
+        "title": "Weapons Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "integer"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "weapon_type": {
+            "type": "string"
+          },
+          "damage_type": {
+            "type": "string"
+          },
+          "effective_range": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "damage_per_hit": {
+            "type": "string"
+          },
+          "attack_speed": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "melee_weapon_type": {
+            "type": "string"
+          },
+          "fire_mode": {
+            "type": "string"
+          },
+          "ads_mode": {
+            "type": "string"
+          },
+          "damage_per_shot": {
+            "type": "string"
+          },
+          "rate_of_fire": {
+            "type": "string"
+          },
+          "clip_size": {
+            "type": "integer"
+          },
+          "reload_speed": {
+            "type": "string"
+          },
+          "accuracy": {
+            "type": "string"
+          },
+          "stability": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "integer"
+          }
+        }
+      },
+      "WeaponsRequest": {
+        "title": "Weapons Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "integer"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "weapon_type": {
+            "type": "string"
+          },
+          "damage_type": {
+            "type": "string"
+          },
+          "effective_range": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "damage_per_hit": {
+            "type": "string"
+          },
+          "attack_speed": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "melee_weapon_type": {
+            "type": "string"
+          },
+          "fire_mode": {
+            "type": "string"
+          },
+          "ads_mode": {
+            "type": "string"
+          },
+          "damage_per_shot": {
+            "type": "string"
+          },
+          "rate_of_fire": {
+            "type": "string"
+          },
+          "clip_size": {
+            "type": "integer"
+          },
+          "reload_speed": {
+            "type": "string"
+          },
+          "accuracy": {
+            "type": "string"
+          },
+          "stability": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "integer"
+          }
+        }
+      },
+      "WeaponsIdRequest": {
+        "title": "Weapons Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "GarmentsResponse": {
+        "title": "Garments Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "integer"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "garment_type": {
+            "type": "string"
+          },
+          "armor_value": {
+            "type": "string"
+          },
+          "dash_stamina_cost": {
+            "type": "string"
+          },
+          "light_dart_mitigation": {
+            "type": "string"
+          },
+          "blade_mitigation": {
+            "type": "string"
+          },
+          "concussive_mitigation": {
+            "type": "string"
+          },
+          "heavy_dart_mitigation": {
+            "type": "string"
+          },
+          "equip_slot": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "energy_mitigation": {
+            "type": "string"
+          },
+          "garment_power_usage": {
+            "type": "string"
+          },
+          "garment_maximum_power": {
+            "type": "string"
+          },
+          "heat_protection": {
+            "type": "string"
+          },
+          "garment_dew_reap_yield": {
+            "type": "string"
+          },
+          "garment_suspensor_power_usage": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "string"
+          },
+          "garment_climbing_drain": {
+            "type": "string"
+          },
+          "worm_threat_scalar": {
+            "type": "string"
+          },
+          "fire_mitigation": {
+            "type": "string"
+          },
+          "poison_mitigation": {
+            "type": "string"
+          },
+          "handheld_scanner_range_bonus": {
+            "type": "string"
+          },
+          "garment_hydration_capture": {
+            "type": "string"
+          },
+          "catchpocket_size": {
+            "type": "string"
+          },
+          "garment_sun_stroke_rate": {
+            "type": "string"
+          },
+          "radiation_mitigation": {
+            "type": "string"
+          }
+        }
+      },
+      "GarmentsRequest": {
+        "title": "Garments Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "integer"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "garment_type": {
+            "type": "string"
+          },
+          "armor_value": {
+            "type": "string"
+          },
+          "dash_stamina_cost": {
+            "type": "string"
+          },
+          "light_dart_mitigation": {
+            "type": "string"
+          },
+          "blade_mitigation": {
+            "type": "string"
+          },
+          "concussive_mitigation": {
+            "type": "string"
+          },
+          "heavy_dart_mitigation": {
+            "type": "string"
+          },
+          "equip_slot": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "energy_mitigation": {
+            "type": "string"
+          },
+          "garment_power_usage": {
+            "type": "string"
+          },
+          "garment_maximum_power": {
+            "type": "string"
+          },
+          "heat_protection": {
+            "type": "string"
+          },
+          "garment_dew_reap_yield": {
+            "type": "string"
+          },
+          "garment_suspensor_power_usage": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "string"
+          },
+          "garment_climbing_drain": {
+            "type": "string"
+          },
+          "worm_threat_scalar": {
+            "type": "string"
+          },
+          "fire_mitigation": {
+            "type": "string"
+          },
+          "poison_mitigation": {
+            "type": "string"
+          },
+          "handheld_scanner_range_bonus": {
+            "type": "string"
+          },
+          "garment_hydration_capture": {
+            "type": "string"
+          },
+          "catchpocket_size": {
+            "type": "string"
+          },
+          "garment_sun_stroke_rate": {
+            "type": "string"
+          },
+          "radiation_mitigation": {
+            "type": "string"
+          }
+        }
+      },
+      "GarmentsIdRequest": {
+        "title": "Garments Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "AmmoResponse": {
+        "title": "Ammo Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          }
+        }
+      },
+      "AmmoRequest": {
+        "title": "Ammo Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          }
+        }
+      },
+      "AmmoIdRequest": {
+        "title": "Ammo Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "ConsumablesResponse": {
+        "title": "Consumables Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          }
+        }
+      },
+      "ConsumablesRequest": {
+        "title": "Consumables Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          }
+        }
+      },
+      "ConsumablesIdRequest": {
+        "title": "Consumables Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "Contract ItemsResponse": {
+        "title": "Contract Items Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          }
+        }
+      },
+      "Contract ItemsRequest": {
+        "title": "Contract Items Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          }
+        }
+      },
+      "Contract ItemsIdRequest": {
+        "title": "Contract Items Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "ResourcesResponse": {
+        "title": "Resources Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "utility_type": {
+            "type": "string"
+          },
+          "fuel_capacity": {
+            "type": "string"
+          }
+        }
+      },
+      "ResourcesRequest": {
+        "title": "Resources Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "utility_type": {
+            "type": "string"
+          },
+          "fuel_capacity": {
+            "type": "string"
+          }
+        }
+      },
+      "ResourcesIdRequest": {
+        "title": "Resources Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "ToolsResponse": {
+        "title": "Tools Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "utility_type": {
+            "type": "string"
+          },
+          "power_consumption": {
+            "type": "string"
+          },
+          "scanner_fov": {
+            "type": "string"
+          },
+          "scanner_range": {
+            "type": "string"
+          },
+          "compactor_gather_rate": {
+            "type": "string"
+          },
+          "mining_tier1_minerals": {
+            "type": "string"
+          },
+          "mining_tier2_minerals": {
+            "type": "string"
+          },
+          "mining_tier3_minerals": {
+            "type": "string"
+          },
+          "mining_tier4_minerals": {
+            "type": "string"
+          },
+          "mining_tier5_minerals": {
+            "type": "string"
+          },
+          "mining_tier6_minerals": {
+            "type": "string"
+          },
+          "blood_extraction_efficiency": {
+            "type": "string"
+          },
+          "dew_reap_area": {
+            "type": "string"
+          },
+          "dew_reap_water_yield": {
+            "type": "string"
+          },
+          "container_capacity": {
+            "type": "string"
+          },
+          "welding_torch_repair_quality": {
+            "type": "string"
+          },
+          "welding_torch_repair_speed": {
+            "type": "string"
+          },
+          "welding_torch_detach_speed": {
+            "type": "string"
+          },
+          "shield_refresh_time": {
+            "type": "string"
+          },
+          "shield_power_drain": {
+            "type": "string"
+          },
+          "worm_attraction_intensity": {
+            "type": "string"
+          },
+          "suspensor_power_drain": {
+            "type": "string"
+          }
+        }
+      },
+      "ToolsRequest": {
+        "title": "Tools Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "utility_type": {
+            "type": "string"
+          },
+          "power_consumption": {
+            "type": "string"
+          },
+          "scanner_fov": {
+            "type": "string"
+          },
+          "scanner_range": {
+            "type": "string"
+          },
+          "compactor_gather_rate": {
+            "type": "string"
+          },
+          "mining_tier1_minerals": {
+            "type": "string"
+          },
+          "mining_tier2_minerals": {
+            "type": "string"
+          },
+          "mining_tier3_minerals": {
+            "type": "string"
+          },
+          "mining_tier4_minerals": {
+            "type": "string"
+          },
+          "mining_tier5_minerals": {
+            "type": "string"
+          },
+          "mining_tier6_minerals": {
+            "type": "string"
+          },
+          "blood_extraction_efficiency": {
+            "type": "string"
+          },
+          "dew_reap_area": {
+            "type": "string"
+          },
+          "dew_reap_water_yield": {
+            "type": "string"
+          },
+          "container_capacity": {
+            "type": "string"
+          },
+          "welding_torch_repair_quality": {
+            "type": "string"
+          },
+          "welding_torch_repair_speed": {
+            "type": "string"
+          },
+          "welding_torch_detach_speed": {
+            "type": "string"
+          },
+          "shield_refresh_time": {
+            "type": "string"
+          },
+          "shield_power_drain": {
+            "type": "string"
+          },
+          "worm_attraction_intensity": {
+            "type": "string"
+          },
+          "suspensor_power_drain": {
+            "type": "string"
+          }
+        }
+      },
+      "ToolsIdRequest": {
+        "title": "Tools Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      },
+      "ItemsResponse": {
+        "title": "Items Response",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "weapon_type": {
+            "type": "string"
+          },
+          "damage_type": {
+            "type": "string"
+          },
+          "fire_mode": {
+            "type": "string"
+          },
+          "ads_mode": {
+            "type": "string"
+          },
+          "damage_per_shot": {
+            "type": "string"
+          },
+          "rate_of_fire": {
+            "type": "string"
+          },
+          "clip_size": {
+            "type": "string"
+          },
+          "reload_speed": {
+            "type": "string"
+          },
+          "effective_range": {
+            "type": "string"
+          },
+          "accuracy": {
+            "type": "string"
+          },
+          "stability": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "garment_type": {
+            "type": "string"
+          },
+          "armor_value": {
+            "type": "string"
+          },
+          "dash_stamina_cost": {
+            "type": "string"
+          },
+          "light_dart_mitigation": {
+            "type": "string"
+          },
+          "blade_mitigation": {
+            "type": "string"
+          },
+          "concussive_mitigation": {
+            "type": "string"
+          },
+          "heavy_dart_mitigation": {
+            "type": "string"
+          },
+          "equip_slot": {
+            "type": "string"
+          },
+          "utility_type": {
+            "type": "string"
+          },
+          "shield_refresh_time": {
+            "type": "string"
+          },
+          "shield_power_drain": {
+            "type": "string"
+          },
+          "damage_per_hit": {
+            "type": "string"
+          },
+          "attack_speed": {
+            "type": "string"
+          },
+          "heat_protection": {
+            "type": "string"
+          },
+          "garment_dew_reap_yield": {
+            "type": "string"
+          },
+          "garment_suspensor_power_usage": {
+            "type": "string"
+          },
+          "vehicle_module_type": {
+            "type": "string"
+          },
+          "assembly_requirement": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "string"
+          },
+          "vehicle_module_armor": {
+            "type": "string"
+          },
+          "utility_slots": {
+            "type": "string"
+          },
+          "fuel_capacity": {
+            "type": "string"
+          },
+          "hull_seats": {
+            "type": "string"
+          },
+          "speed": {
+            "type": "string"
+          },
+          "power_consumption_per_second": {
+            "type": "string"
+          },
+          "inventory_volume": {
+            "type": "string"
+          },
+          "inventory_slots": {
+            "type": "string"
+          },
+          "garment_hydration_capture": {
+            "type": "string"
+          },
+          "catchpocket_size": {
+            "type": "string"
+          },
+          "blood_extraction_efficiency": {
+            "type": "string"
+          },
+          "acceleration_type": {
+            "type": "string"
+          },
+          "heat_increase_second": {
+            "type": "string"
+          },
+          "mining_tier1_minerals": {
+            "type": "string"
+          },
+          "mining_tier2_minerals": {
+            "type": "string"
+          },
+          "mining_tier3_minerals": {
+            "type": "string"
+          },
+          "mining_tier4_minerals": {
+            "type": "string"
+          },
+          "mining_tier5_minerals": {
+            "type": "string"
+          },
+          "mining_tier6_minerals": {
+            "type": "string"
+          },
+          "energy_mitigation": {
+            "type": "string"
+          },
+          "power_consumption": {
+            "type": "string"
+          },
+          "dew_reap_area": {
+            "type": "string"
+          },
+          "dew_reap_water_yield": {
+            "type": "string"
+          },
+          "garment_power_usage": {
+            "type": "string"
+          },
+          "compactor_gather_rate": {
+            "type": "string"
+          },
+          "container_capacity": {
+            "type": "string"
+          },
+          "worm_attraction_intensity": {
+            "type": "string"
+          },
+          "suspensor_power_drain": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "shield": {
+            "type": "string"
+          },
+          "scanner_fov": {
+            "type": "string"
+          },
+          "scanner_range": {
+            "type": "string"
+          },
+          "garment_climbing_drain": {
+            "type": "string"
+          },
+          "worm_threat_scalar": {
+            "type": "string"
+          },
+          "power_pack_regen": {
+            "type": "string"
+          },
+          "power_pack_maximum_power": {
+            "type": "string"
+          },
+          "garment_sun_stroke_rate": {
+            "type": "string"
+          },
+          "garment_maximum_power": {
+            "type": "string"
+          },
+          "melee_weapon_type": {
+            "type": "string"
+          },
+          "fire_mitigation": {
+            "type": "string"
+          },
+          "radiation_mitigation": {
+            "type": "string"
+          },
+          "poison_mitigation": {
+            "type": "string"
+          },
+          "damage": {
+            "type": "string"
+          },
+          "durability": {
+            "type": "string"
+          },
+          "handheld_scanner_range_bonus": {
+            "type": "string"
+          },
+          "welding_torch_repair_quality": {
+            "type": "string"
+          },
+          "welding_torch_repair_speed": {
+            "type": "string"
+          },
+          "welding_torch_detach_speed": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemsRequest": {
+        "title": "Items Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "added": {
+            "type": "string"
+          },
+          "market_price": {
+            "type": "string"
+          },
+          "max_stack": {
+            "type": "string"
+          },
+          "volume": {
+            "type": "string"
+          },
+          "long_description": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "item_tags": {
+            "type": "string"
+          },
+          "death_drop": {
+            "type": "string"
+          },
+          "unique_schematic": {
+            "type": "string"
+          },
+          "weapon_type": {
+            "type": "string"
+          },
+          "damage_type": {
+            "type": "string"
+          },
+          "fire_mode": {
+            "type": "string"
+          },
+          "ads_mode": {
+            "type": "string"
+          },
+          "damage_per_shot": {
+            "type": "string"
+          },
+          "rate_of_fire": {
+            "type": "string"
+          },
+          "clip_size": {
+            "type": "string"
+          },
+          "reload_speed": {
+            "type": "string"
+          },
+          "effective_range": {
+            "type": "string"
+          },
+          "accuracy": {
+            "type": "string"
+          },
+          "stability": {
+            "type": "string"
+          },
+          "repair_decay_rate": {
+            "type": "string"
+          },
+          "garment_type": {
+            "type": "string"
+          },
+          "armor_value": {
+            "type": "string"
+          },
+          "dash_stamina_cost": {
+            "type": "string"
+          },
+          "light_dart_mitigation": {
+            "type": "string"
+          },
+          "blade_mitigation": {
+            "type": "string"
+          },
+          "concussive_mitigation": {
+            "type": "string"
+          },
+          "heavy_dart_mitigation": {
+            "type": "string"
+          },
+          "equip_slot": {
+            "type": "string"
+          },
+          "utility_type": {
+            "type": "string"
+          },
+          "shield_refresh_time": {
+            "type": "string"
+          },
+          "shield_power_drain": {
+            "type": "string"
+          },
+          "damage_per_hit": {
+            "type": "string"
+          },
+          "attack_speed": {
+            "type": "string"
+          },
+          "heat_protection": {
+            "type": "string"
+          },
+          "garment_dew_reap_yield": {
+            "type": "string"
+          },
+          "garment_suspensor_power_usage": {
+            "type": "string"
+          },
+          "vehicle_module_type": {
+            "type": "string"
+          },
+          "assembly_requirement": {
+            "type": "string"
+          },
+          "base_vendor_price": {
+            "type": "string"
+          },
+          "vehicle_module_armor": {
+            "type": "string"
+          },
+          "utility_slots": {
+            "type": "string"
+          },
+          "fuel_capacity": {
+            "type": "string"
+          },
+          "hull_seats": {
+            "type": "string"
+          },
+          "speed": {
+            "type": "string"
+          },
+          "power_consumption_per_second": {
+            "type": "string"
+          },
+          "inventory_volume": {
+            "type": "string"
+          },
+          "inventory_slots": {
+            "type": "string"
+          },
+          "garment_hydration_capture": {
+            "type": "string"
+          },
+          "catchpocket_size": {
+            "type": "string"
+          },
+          "blood_extraction_efficiency": {
+            "type": "string"
+          },
+          "acceleration_type": {
+            "type": "string"
+          },
+          "heat_increase_second": {
+            "type": "string"
+          },
+          "mining_tier1_minerals": {
+            "type": "string"
+          },
+          "mining_tier2_minerals": {
+            "type": "string"
+          },
+          "mining_tier3_minerals": {
+            "type": "string"
+          },
+          "mining_tier4_minerals": {
+            "type": "string"
+          },
+          "mining_tier5_minerals": {
+            "type": "string"
+          },
+          "mining_tier6_minerals": {
+            "type": "string"
+          },
+          "energy_mitigation": {
+            "type": "string"
+          },
+          "power_consumption": {
+            "type": "string"
+          },
+          "dew_reap_area": {
+            "type": "string"
+          },
+          "dew_reap_water_yield": {
+            "type": "string"
+          },
+          "garment_power_usage": {
+            "type": "string"
+          },
+          "compactor_gather_rate": {
+            "type": "string"
+          },
+          "container_capacity": {
+            "type": "string"
+          },
+          "worm_attraction_intensity": {
+            "type": "string"
+          },
+          "suspensor_power_drain": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "shield": {
+            "type": "string"
+          },
+          "scanner_fov": {
+            "type": "string"
+          },
+          "scanner_range": {
+            "type": "string"
+          },
+          "garment_climbing_drain": {
+            "type": "string"
+          },
+          "worm_threat_scalar": {
+            "type": "string"
+          },
+          "power_pack_regen": {
+            "type": "string"
+          },
+          "power_pack_maximum_power": {
+            "type": "string"
+          },
+          "garment_sun_stroke_rate": {
+            "type": "string"
+          },
+          "garment_maximum_power": {
+            "type": "string"
+          },
+          "melee_weapon_type": {
+            "type": "string"
+          },
+          "fire_mitigation": {
+            "type": "string"
+          },
+          "radiation_mitigation": {
+            "type": "string"
+          },
+          "poison_mitigation": {
+            "type": "string"
+          },
+          "damage": {
+            "type": "string"
+          },
+          "durability": {
+            "type": "string"
+          },
+          "handheld_scanner_range_bonus": {
+            "type": "string"
+          },
+          "welding_torch_repair_quality": {
+            "type": "string"
+          },
+          "welding_torch_repair_speed": {
+            "type": "string"
+          },
+          "welding_torch_detach_speed": {
+            "type": "string"
+          }
+        }
+      },
+      "ItemsIdRequest": {
+        "title": "Items Id Request",
+        "type": "object",
+        "description": "",
+        "x-internal": false,
+        "properties": {
+          "Id": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "xcToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "xc-token",
+        "description": "API token"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "BadRequest",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "msg": {
+                  "type": "string",
+                  "x-stoplight": {
+                    "id": "p9mk4oi0hbihm"
+                  },
+                  "example": "BadRequest [Error]: <ERROR MESSAGE>"
+                }
+              },
+              "required": ["msg"]
+            },
+            "examples": {
+              "Example 1": {
+                "value": {
+                  "msg": "BadRequest [Error]: <ERROR MESSAGE>"
+                }
+              }
+            }
+          }
+        },
+        "headers": {}
+      }
+    }
+  }
+}
