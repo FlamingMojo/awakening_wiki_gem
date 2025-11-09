@@ -108,12 +108,5 @@ module AwakeningWiki
     alias_method :id, :item_id
     alias_method :created_at, :CreatedAt
     alias_method :updated_at, :UpdatedAt
-
-    def something
-      {
-        a: 'a',
-        b: 'b',
-      }
-    end
   end
 end
